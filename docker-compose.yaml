@@ -1,0 +1,9 @@
+version: '3.7'
+
+services:
+  api:
+    build: .
+    volumes:
+      - ./exbot:/app:cached
+      - ~/.ssh:/root/.ssh
+      - ~/.bash_history:/root/.bash_history
