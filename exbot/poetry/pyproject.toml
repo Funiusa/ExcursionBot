@@ -6,6 +6,15 @@ authors = ["Denis"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+python-dotenv = "^1.0.0"
+telegram = "^0.0.1"
+black = "^23.3.0"
+aiogram = "^2.25.1"
+logging = "^0.4.9.6"
+asyncio = "^3.4.3"
+psycopg2-binary = "^2.9.6"
+gino = "^1.0.1"
+asyncpg = "^0.27.0"
 
 [tool.poetry.dev-dependencies]
 

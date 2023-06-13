@@ -36,11 +36,13 @@ ENV PATH $PATH:/root/.poetry/bin
 
 RUN poetry config virtualenvs.create false
 
-RUN mkdir -p /app
+RUN mkdir -p /app/poetry
 
 WORKDIR /app
 
 COPY ./exbot/ app/
-COPY ./exbot/pyproject.toml ./exbot/config.toml ./
+COPY ./exbot/poetry/pyproject.toml ./exbot/poetry/poetry_config.toml ./
 
 RUN poetry install  --no-interaction --no-ansi
+
+CMD ["python", "main.py"]
