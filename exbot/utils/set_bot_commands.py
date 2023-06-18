@@ -4,9 +4,11 @@ from aiogram import types, Dispatcher
 async def set_default_commands(dp: Dispatcher):
     await dp.bot.set_my_commands(
         [
-            types.BotCommand("start", "Greetings"),
-            types.BotCommand("help", "Help"),
-            types.BotCommand("excursions", "List of all excursions"),
-            types.BotCommand("registration", "Registration on the site"),
+            types.BotCommand("start", "Запуск бота"),
+            types.BotCommand("about", "Знакомство с ботом"),
+            types.BotCommand("help", "Что такое антиэкскурсия?"),
+            types.BotCommand("anti_excursions", "Выбрать антиэкскурсию"),
+            types.BotCommand("commands", "Список команд"),
+            types.BotCommand("registration", "Регистрация"),
         ]
     )

@@ -14,7 +14,7 @@ inline_menu = InlineKeyboardMarkup(
             ),
         ],
         [
-            InlineKeyboardButton(text="Excursions", callback_data="Excursions"),
+            InlineKeyboardButton(text="Anti-excursions", callback_data="view_guides"),
         ],
     ],
 )

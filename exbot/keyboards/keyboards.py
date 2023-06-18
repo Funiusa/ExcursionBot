@@ -38,10 +38,12 @@ channel_link_button = KeyboardButton(
     text="Оф. канал Telegram", url="tg://resolve?domain=telegram"
 )
 
-excursions_button = KeyboardButton(text="Экскурсии", callback_data="view_guides")
-all_commands_button = KeyboardButton(text="Список команд", callback_data="help")
+excursions_button = KeyboardButton(text="Антиэкскурсии", callback_data="view_guides")
+all_commands_button = KeyboardButton(text="Список команд", callback_data="")
 
 main_buttons = [
     excursions_button,
     all_commands_button,
 ]
+replay_main_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+replay_main_keyboard.add(*main_buttons)

@@ -1,8 +1,6 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-import keyboards
-import text
 from dispatcher import dp
 from state import Registration
 
@@ -29,5 +27,7 @@ async def state2(message: types.Message, state: FSMContext):
     await state.update_data(state2=answer)
     data = await state.get_data()
     name, age = data.get("state1"), data.get("state2")
-    await message.answer(f"{name.capitalize()}, регистрация успешно завершена.\nТебе {age} лет")
+    await message.answer(
+        f"{name.capitalize()}, регистрация успешно завершена.\nТебе {age} лет"
+    )
     await state.finish()
