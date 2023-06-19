@@ -1,16 +1,15 @@
-import os
 from asyncio import sleep
-from typing import List
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters.state import State
 
 from content.excursions_list import guides
 from content.questions import questions
 from dispatcher import dp, bot
-from keyboards import keyboards
+from keyboards.keyboard import keyboards
+from keyboards.inline import inline_keyboard
 from state import QuestionsState
+from utils.data import get_addition_data, clear_answer
 
 
 @dp.callback_query_handler(lambda c: c.data.startswith("view_guide_"))
@@ -78,48 +77,29 @@ async def start_handler(callback_query: types.CallbackQuery, state: FSMContext):
     await ask_next_question(message=callback_query.message, state=state, index=index)
 
 
-def get_addition_data(title: str, index: int) -> list:
-    path = f"data/{title}/{index}"
-    files = []
-
-    if os.path.exists(path):
-        for root, _, filenames in os.walk(path):
-            for filename in filenames:
-                file_path = os.path.join(root, filename)
-                files.append(file_path)
-    return files
-
-
 async def ask_next_question(message: types.Message, state: FSMContext, index: int):
     data = await state.get_data()
     question = data["questions"]
-    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    hint_button = types.KeyboardButton("Подсказка")
-    end_button = types.KeyboardButton("Завершить")
-    keyboard.add(hint_button, end_button)
     try:
-        image_path = question[index]["image"]
-        if image_path:
-            with open(image_path, "rb") as photo:
+        place_image = question[index]["place"]
+        if place_image:
+            with open(place_image, "rb") as photo:
                 await bot.send_photo(
-                    chat_id=message.chat.id, photo=photo, reply_markup=keyboard
+                    chat_id=message.chat.id,
+                    reply_markup=keyboards.on_place,
+                    photo=photo,
                 )
-            answer = question[index]["answer"]
-            hint = question[index]["hint"]
-            correct = question[index]["correct"]
-            end_question = question[index]["end"]
             folder_name = question[index]["addition"]
-            addition = get_addition_data(folder_name, index + 1)
             await state.update_data(
-                answer=answer,
-                hint=hint,
-                correct=correct,
-                end=end_question,
-                addition=addition,
                 index=index,
+                end=question[index]["end"],
+                hint=question[index]["hint"],
+                answer=question[index]["answer"],
+                correct=question[index]["correct"],
+                question=question[index]["question"],
+                addition=get_addition_data(folder_name, index + 1),
             )
             await QuestionsState.question.set()
-            await message.answer("Вводи ответ тут и жми отправить!")
     except IndexError:
         await message.answer("Вы прошли ознокомительный блок")
         path = "data/end.jpg"
@@ -127,16 +107,22 @@ async def ask_next_question(message: types.Message, state: FSMContext, index: in
             await bot.send_photo(
                 chat_id=message.chat.id,
                 photo=photo,
-                reply_markup=keyboards.replay_main_keyboard,
+                reply_markup=keyboards.main_keyboard,
             )
         await state.finish()
 
 
-def clear_answer(line: str) -> str:
-    import re
+@dp.message_handler(text="На месте", state=QuestionsState.question)
+async def get_question(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    path = data["question"]
+    with open(path, "rb") as image:
+        await message.answer_photo(photo=image)
+    await state.update_data(hint=None)
 
-    answer = "".join(re.findall(r"\b\w+\b", line)).lower()
-    return answer
+    await message.answer(
+        "Вводи ответ тут и жми отправить!", reply_markup=keyboards.back
+    )
 
 
 @dp.message_handler(state=QuestionsState.question)
@@ -148,7 +134,7 @@ async def answer_handler(message: types.Message, state: FSMContext):
     correct = data["correct"]
     end_question = data["end"]
     addition = data["addition"]
-    answer = clear_answer(message.text)
+    answer = clear_answer(str(message.text))
     inline_next = types.InlineKeyboardMarkup()
 
     next_question = types.InlineKeyboardButton(
@@ -173,21 +159,25 @@ async def answer_handler(message: types.Message, state: FSMContext):
             await bot.send_photo(
                 chat_id=message.chat.id,
                 photo=photo,
-                reply_markup=keyboards.replay_main_keyboard,
+                reply_markup=keyboards.main_keyboard,
             )
         await state.finish()
     else:
-        if hint and message.text in ["Подсказка", "/hint", "hint", "for подсказка"]:
-            with open(hint, "rb") as photo:
-                # await message.answer_photo(photo=photo, reply_markup=keyboard)
-                await message.reply_photo(photo=photo)
+        if hint and message.text in ["Подсказка", "/hint", "hint", "подсказка"]:
+            await message.reply(text=hint)
+        elif hint:
+            await message.answer(
+                "Воспользуйся подсказкой, если возникти сложности с поиском места.",
+                reply_markup=keyboards.hint_exit,
+            )
         else:
             await message.answer("Ответ не верный. Попробуй еще раз")
 
 
 @dp.callback_query_handler(
-    lambda c: c.data.startswith("next_question"), state=QuestionsState.question
+    lambda c: c.data.startswith("next_question_"), state=QuestionsState.question
 )
 async def switch_to_next_question(call: types.CallbackQuery, state: FSMContext):
     index = int(call.data.split("_")[-1])
     await ask_next_question(call.message, state, index + 1)
+    await call.message.delete_reply_markup()

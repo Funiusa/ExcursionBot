@@ -2,6 +2,8 @@ import asyncio
 import logging
 from dispatcher import bot
 from handlers import dp
+from config import POSTGRES_URL
+from db import BaseModel, create_engine, proceed_schemas, get_session_maker
 
 
 async def on_startup():
@@ -14,6 +16,9 @@ async def on_startup():
     from utils.set_bot_commands import set_default_commands
 
     await set_default_commands(dp)
+    async_engine = create_engine(POSTGRES_URL)
+    session_maker = get_session_maker(async_engine)
+    await proceed_schemas(async_engine, BaseModel.metadata)
 
 
 async def main():

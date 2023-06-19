@@ -1,19 +1,18 @@
-from asyncio import sleep
-
 from aiogram import types
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
 from content import help
 from dispatcher import dp, bot
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton
 
 
 async def block_handler(message: types.Message, text: str, block_index: int):
     if block_index < len(help.help):
         block = help.help[block_index]
         title = block["title"]
+        help_keyboard = InlineKeyboardMarkup()
         button = InlineKeyboardButton(text=title, callback_data=f"block_{block_index}")
-        keyboard = InlineKeyboardMarkup(row_width=1)
-        keyboard.add(button)
-        await message.answer(text, reply_markup=keyboard)
+        help_keyboard.add(button)
+        await message.answer(text, reply_markup=help_keyboard)
     else:
         await message.answer(text)
     await message.delete_reply_markup()

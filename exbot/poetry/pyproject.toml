@@ -13,8 +13,9 @@ aiogram = "^2.25.1"
 logging = "^0.4.9.6"
 asyncio = "^3.4.3"
 psycopg2-binary = "^2.9.6"
-gino = "^1.0.1"
 asyncpg = "^0.27.0"
+greenlet = "^2.0.2"
+sqlalchemy = "^2.0.16"
 
 [tool.poetry.dev-dependencies]
 

@@ -1,3 +1,3 @@
-from .keyboards import *
+from keyboards.keyboard.keyboards import *
 
 __all__ = "*"

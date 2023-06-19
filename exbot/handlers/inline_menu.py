@@ -2,14 +2,13 @@ from asyncio import sleep
 
 from aiogram import types
 
-import text
 from dispatcher import dp
-from keyboards.inline.menu import inline_menu
+from keyboards.inline import inline_keyboard
 
 
 @dp.message_handler(text="menu")
 async def show_inline_menu(message: types.Message):
-    await message.answer("Inline menu", reply_markup=inline_menu)
+    await message.answer("Inline menu", reply_markup=inline_keyboard.menu)
 
 
 @dp.callback_query_handler(text="alert")

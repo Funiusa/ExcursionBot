@@ -1,5 +1,11 @@
-from config import POSTGRES_URI
-
 __all__ = [
-    "POSTGRES_URI",
+    "BaseModel",
+    "create_engine",
+    "get_session_maker",
+    "proceed_schemas",
+    "User",
 ]
+
+from .base import BaseModel
+from .engine import create_engine, get_session_maker, proceed_schemas
+from .user import User
