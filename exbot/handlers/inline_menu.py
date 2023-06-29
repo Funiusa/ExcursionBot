@@ -3,7 +3,7 @@ from asyncio import sleep
 from aiogram import types
 
 from dispatcher import dp
-from keyboards.inline import inline_keyboard
+from keyboards.inline import ikb
 
 
 @dp.message_handler(text="menu")

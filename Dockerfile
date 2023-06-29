@@ -1,4 +1,4 @@
-FROM python:3.9-slim-buster
+FROM python:3.10-slim-buster
 
 LABEL authors="Denis"
 
@@ -44,5 +44,3 @@ COPY ./exbot/ app/
 COPY ./exbot/poetry/pyproject.toml ./exbot/poetry/poetry_config.toml ./
 
 RUN poetry install  --no-interaction --no-ansi
-
-CMD ["python", "main.py"]

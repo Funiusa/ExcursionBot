@@ -23,7 +23,7 @@ hint_exit = ReplyKeyboardMarkup(
     keyboard=[[KeyboardButton("Подсказка"), KeyboardButton("Завершить")]],
 )
 
-back = ReplyKeyboardMarkup(
+complete = ReplyKeyboardMarkup(
     resize_keyboard=True,
     keyboard=[[KeyboardButton("Завершить")]],
 )

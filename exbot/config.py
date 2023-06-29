@@ -1,23 +1,32 @@
 import os
-
 from sqlalchemy import URL
+from dotenv import load_dotenv
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
-USERNAME = os.environ.get("POSTGRES_USER")
-PASSWORD = os.environ.get("POSTGRES_PASSWORD")
-DB_NAME = os.environ.get("DATABASE_NAME")
-HOST = os.environ.get("DATABASE_HOST")
-PORT = os.environ.get("DATABASE_PORT")
+load_dotenv()
 
-POSTGRES_URL = URL.create(
+BOT_TOKEN = os.environ["BOT_TOKEN"]
+# PAY_TOKEN = os.environ["PAY_TOKEN"]
+DATABASE_NAME = os.getenv("DATABASE_NAME")
+DATABASE_USER = os.getenv("POSTGRES_USER")
+DATABASE_PASSWORD = os.getenv("POSTGRES_USER")
+DATABASE_HOST = os.getenv("DATABASE_HOST")
+DATABASE_PORT = os.getenv("DATABASE_PORT")
+
+admins_id = os.getenv("ADMINS")
+async_url = URL.create(
     "postgresql+asyncpg",
-    username=USERNAME,
-    password=PASSWORD,
-    host=HOST,
-    port=PORT,
-    database=DB_NAME,
+    username=DATABASE_USER,
+    password=DATABASE_PASSWORD,
+    host=DATABASE_HOST,
+    port=int(DATABASE_PORT),
+    database=DATABASE_NAME,
 )
 
-admins_id = [
-    292612693,
-]
+url = URL.create(
+    "postgresql+psycopg2",
+    username=DATABASE_USER,
+    password=DATABASE_PASSWORD,
+    host=DATABASE_HOST,
+    port=int(DATABASE_PORT),
+    database=DATABASE_NAME,
+)
