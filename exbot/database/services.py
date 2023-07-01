@@ -72,9 +72,9 @@ async def create_token(admin: models.Admin):
 #         return False
 #     return admin
 
+
 async def authenticate_admin(
-        token: str = fastapi.Depends(create_token),
-        db: "Session" = fastapi.Depends(get_db)
+    token: str = fastapi.Depends(create_token), db: "Session" = fastapi.Depends(get_db)
 ):
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
@@ -100,8 +100,8 @@ def create_access_token(data: dict, expires_delta: timedelta) -> str:
 
 
 async def get_current_admin(
-        db: "Session" = fastapi.Depends(get_db),
-        token: str = fastapi.Depends(oauth2schema),
+    db: "Session" = fastapi.Depends(get_db),
+    token: str = fastapi.Depends(oauth2schema),
 ):
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
@@ -143,7 +143,7 @@ async def retrieve_user(user_id: int, db: "Session") -> schemas.User:
 
 
 async def create_excursion(
-        excursion: schemas.ExcursionCreate, db: "Session"
+    excursion: schemas.ExcursionCreate, db: "Session"
 ) -> schemas.Excursion:
     excursion = models.Excursion(**excursion.dict())
     db.add(excursion)
@@ -178,7 +178,7 @@ async def retrieve_excursion(e_id: int, db: "Session"):
 
 
 async def update_excursion(
-        excursion: models.Excursion, data: schemas.ExcursionCreate, db: "Session"
+    excursion: models.Excursion, data: schemas.ExcursionCreate, db: "Session"
 ):
     excursion.title = data.title
     excursion.intro = data.intro
@@ -196,7 +196,7 @@ async def delete_excursion(excursion: models.Excursion, db: "Session"):
 
 
 async def create_question(
-        question: schemas.QuestionCreate, db: "Session", excursion_id: int
+    question: schemas.QuestionCreate, db: "Session", excursion_id: int
 ) -> schemas.Question:
     question = models.Question(**question.dict(), excursion_id=excursion_id)
     db.add(question)
@@ -226,7 +226,7 @@ async def retrieve_question(q_id: int, db: "Session"):
 
 
 async def update_question(
-        question: models.Question, data: schemas.QuestionCreate, db: "Session"
+    question: models.Question, data: schemas.QuestionCreate, db: "Session"
 ):
     question.place = data.place
     question.answer = data.answer

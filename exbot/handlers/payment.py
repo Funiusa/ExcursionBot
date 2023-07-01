@@ -13,8 +13,9 @@ async def payment(call: types.CallbackQuery):
     data = call.data.split("_")
     telegram_id = data[-1]
     excursion_title = data[-2]
-    user = await services.get_user_by_telegram_id(telegram_id=int(telegram_id),
-                                                  db=session)
+    user = await services.get_user_by_telegram_id(
+        telegram_id=int(telegram_id), db=session
+    )
     if not user:
         await call.answer("You have to register before")
         ikb.register_ikb.inline_keyboard.clear()

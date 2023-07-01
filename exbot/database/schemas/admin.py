@@ -25,6 +25,11 @@ class Admin(AdminBase):
                 "telegram_id": 411345345,
                 "username": "Example",
                 "email": "example@example.com",
-                "password": "pass"
+                "password": "pass",
             }
         }
+
+
+class AdminLogin(BaseModel):
+    username: str
+    password: str
