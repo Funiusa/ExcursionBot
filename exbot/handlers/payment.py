@@ -18,7 +18,8 @@ async def payment(call: types.CallbackQuery):
         ikb.register_ikb.inline_keyboard.clear()
         ikb.register_ikb.add(*ikb.ikb)
         await call.message.edit_text(
-            "Please send me your contact for registration", reply_markup=ikb.register_ikb
+            "Please send me your contact for registration",
+            reply_markup=ikb.register_ikb,
         )
     else:
         excursion = await services.get_excursion_by_title(excursion_title, session)

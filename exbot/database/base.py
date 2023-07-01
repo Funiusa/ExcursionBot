@@ -1,6 +1,6 @@
 from sqlalchemy.ext.declarative import declarative_base
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 from config import url, async_url
 
@@ -10,3 +10,4 @@ session = SessionLocal()
 
 
 Base = declarative_base()
+meta = MetaData()

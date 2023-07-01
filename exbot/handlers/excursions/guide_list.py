@@ -66,7 +66,7 @@ async def show_excursions_end(call: types.CallbackQuery):
         text=greet.excursion_greet,
         chat_id=call.message.chat.id,
         message_id=message_id,
-        reply_markup=ex_markup
+        reply_markup=ex_markup,
     )
 
 
@@ -81,9 +81,7 @@ async def excursion_detail(call: types.CallbackQuery):
 
     excursion = await get_excursion_by_title(title=title, db=session)
 
-    back_button = types.InlineKeyboardButton(
-        "Назад", callback_data="guides_list"
-    )
+    back_button = types.InlineKeyboardButton("Назад", callback_data="guides_list")
     if user and title in [ex.title for ex in user.excursions]:
         choose_button = types.InlineKeyboardButton(
             "Пройти", callback_data=f"guide_{title}"

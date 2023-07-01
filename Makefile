@@ -11,13 +11,13 @@ up:
 	$(DC) up
 
 run_api:
-	$(DC_RUN) api $(ARGS)
+	$(DC_RUN) -p 8000:8000 api $(ARGS)
 
 run_bot:
 	$(DC_RUN) bot $(ARGS)
 
 upd:
-	$(DC_RUN) -d up $(ARGS)
+	$(DC) up -d $(ARGS)
 
 build:
 	$(DC) build

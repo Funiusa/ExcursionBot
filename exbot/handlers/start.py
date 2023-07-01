@@ -9,7 +9,7 @@ from keyboards.keyboard.keyboards import main_keyboard
 async def start_handler(message: types.Message):
     await message.answer(
         text=text.start.format(name=message.from_user.first_name),
-        reply_markup=main_menu
+        reply_markup=main_menu,
     )
 
 

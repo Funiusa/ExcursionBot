@@ -11,6 +11,7 @@ x-db-config: &db-config
 services:
   api:
     build: .
+    restart: unless-stopped
     ports:
       - 8000:8000
     networks:
@@ -27,6 +28,7 @@ services:
 
   bot:
     build: .
+    restart: unless-stopped
     depends_on:
       - db
       - api
@@ -42,6 +44,7 @@ services:
 
   db:
     image: postgres:15.2-alpine
+    restart: unless-stopped
     ports:
       - 5432:5432
     networks:

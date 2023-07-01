@@ -55,11 +55,7 @@ async def contact_handler(message: types.Message, state: FSMContext):
     user_id = message.contact.user_id
     username = message.chat.username
 
-    await state.update_data(
-        phone=phone,
-        user_id=user_id,
-        username=username
-    )
+    await state.update_data(phone=phone, user_id=user_id, username=username)
     await check_contact(message=message, state=state)
 
 
