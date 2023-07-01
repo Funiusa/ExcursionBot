@@ -33,9 +33,9 @@ async def registration_state_handler(call: types.CallbackQuery):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     kb = types.KeyboardButton("Send my contact", request_contact=True)
     markup.add(kb)
-    user_id = call.from_user.id
+    telegram_id = call.from_user.id
 
-    result = session.execute(select(User).where(User.user_id == user_id))
+    result = session.execute(select(User).where(User.telegram_id == telegram_id))
     user = result.one_or_none()
     if not user:
         await call.message.delete()
@@ -50,21 +50,21 @@ async def registration_state_handler(call: types.CallbackQuery):
 @dp.message_handler(content_types=types.ContentType.CONTACT, state=Registration.contact)
 async def contact_handler(message: types.Message, state: FSMContext):
     phone = message.contact.phone_number
-    user_id = message.contact.user_id
+    telegram_id = message.contact.user_id
     username = message.chat.username
 
-    await state.update_data(phone=phone, user_id=user_id, username=username)
+    await state.update_data(phone=phone, telegram_id=telegram_id, username=username)
     await check_contact(message=message, state=state)
 
 
 async def check_contact(message: types.message, state: FSMContext):
     data = await state.get_data()
-    user_id = data["user_id"]
+    telegram_id = data["telegram_id"]
     username = data["username"]
     phone = data["phone"]
-    user = await services.get_user_by_telegram_id(telegram_id=user_id, db=session)
+    user = await services.get_user_by_telegram_id(telegram_id=telegram_id, db=session)
     if not user and phone_validation(phone):
-        data = {"user_id": user_id, "username": username, "phone": phone}
+        data = {"telegram_id": telegram_id, "username": username, "phone": phone}
         user_create = schemas.UserCreate(**data)
         await services.create_user(user_create, session)
         await message.delete()

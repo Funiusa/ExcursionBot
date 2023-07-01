@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import List, Annotated, Dict
 
 import fastapi
@@ -5,6 +6,7 @@ from fastapi import FastAPI, Depends, security
 from sqlalchemy.orm import Session
 
 from database import models, schemas, services
+from database.services import create_access_token
 
 app = FastAPI()
 
@@ -17,28 +19,53 @@ async def root():
     return {"message": "Hello! Happy birthday! Good luck to you)"}
 
 
-@app.post("/api/token/", tags=["Auth"])
-async def generate_token(
-        form_data: security.OAuth2PasswordRequestForm = Depends(),
-        db: Session = Depends(services.get_db)
+#
+# @app.post("/api/token/", tags=["Auth"])
+# async def generate_token(
+#         form_data: security.OAuth2PasswordRequestForm = Depends(),
+#         db: Session = Depends(services.get_db)
+# ):
+#     admin = await services.authenticate_admin(
+#         email=form_data.username, password=form_data.password, db=db
+#     )
+#     if not admin:
+#         raise fastapi.HTTPException(status_code=401, detail="Not valid credential")
+#     return await services.create_token(admin)
+#
+
+@app.post("/login", tags=["Auth"])
+async def admin_login(
+        admin_data: schemas.AdminLogin, db: "Session" = Depends(services.get_db)
 ):
-    admin = await services.authenticate_admin(
-        email=form_data.username, password=form_data.password, db=db
-    )
-    if not admin:
-        raise fastapi.HTTPException(status_code=401, detail="Not valid credential")
-    return await services.create_token(admin)
+    admin = db.query(models.Admin).filter_by(username=admin_data.username).first()
+    if not admin or not admin.verify_password(admin_data.password):
+        raise fastapi.HTTPException(
+            status_code=401, detail="Invalid username or password"
+        )
+    token = create_access_token(data={"sub": admin.username}, expires_delta=timedelta(30))
+    return {"access_token": token, "token_type": "bearer"}
 
 
-@app.post("/api/admins", tags=["Admins"])
-async def create_admin(
-        admin: schemas.AdminCreate, db: Session = Depends(services.get_db)
-):
-    db_admin = await services.get_admin_by_email(email=admin.email, db=db)
-    if db_admin:
-        raise fastapi.HTTPException(status_code=400, detail="Email already in use")
-    await services.create_admin(admin=admin, db=db)
-    return await services.create_token(admin)
+# @app.post("/admin", dependencies=[Depends(services.authenticate_admin)])
+# async def create_admin(
+#         admin_data: schemas.AdminCreate, db: Session = Depends(services.get_db)
+# ):
+#     db_admin = await services.get_admin_by_email(email=admin_data.email, db=db)
+#     if db_admin:
+#         raise fastapi.HTTPException(status_code=400, detail="Email already in use")
+#     await services.create_admin(admin=admin_data, db=db)
+#     return {"message": "Admin created successfully"}
+
+
+# @app.post("/api/admins", tags=["Admins"])
+# async def create_admin(
+#         admin: schemas.AdminCreate, db: Session = Depends(services.get_db)
+# ):
+#     db_admin = await services.get_admin_by_email(email=admin.email, db=db)
+#     if db_admin:
+#         raise fastapi.HTTPException(status_code=400, detail="Email already in use")
+#     await services.create_admin(admin=admin, db=db)
+#     return await services.create_token(admin)
 
 
 @app.get("/api/admins", tags=["Admins"])
