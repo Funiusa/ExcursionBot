@@ -1,6 +1,8 @@
+from datetime import timedelta, datetime
 from typing import List
 
 import fastapi
+import jwt
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -10,10 +12,11 @@ from database import models, schemas
 import fastapi.security as _security
 
 from passlib import hash
-import jwt as _jwt
 
 JWT_SECRET = "myjwtsecret"
 oauth2schema = _security.OAuth2PasswordBearer(tokenUrl="/api/token")
+JWT_ALGORITHM = "HS256"
+JWT_EXPIRATION_TIME = timedelta(minutes=30)
 
 
 def create_database():
@@ -55,19 +58,45 @@ async def create_admin(admin: schemas.AdminCreate, db: "Session") -> schemas.Adm
         raise fastapi.HTTPException(status_code=404, detail=f"Exception: {ex}")
 
 
-async def authenticate_admin(email: str, password: str, db: "Session"):
-    admin = await get_admin_by_email(email=email, db=db)
-    if not admin:
-        return False
-    if not admin.verify_password(password):
-        return False
-    return admin
-
-
 async def create_token(admin: models.Admin):
     admin_obj = schemas.Admin.from_orm(admin)
-    token = _jwt.encode(admin_obj.dict(), JWT_SECRET)
+    token = jwt.encode(admin_obj.dict(), JWT_SECRET)
     return dict(access_token=token, token_type="bearer")
+
+
+# async def authenticate_admin(email: str, password: str, db: "Session"):
+#     admin = await get_admin_by_email(email=email, db=db)
+#     if not admin:
+#         return False
+#     if not admin.verify_password(password):
+#         return False
+#     return admin
+
+async def authenticate_admin(
+        token: str = fastapi.Depends(create_token),
+        db: "Session" = fastapi.Depends(get_db)
+):
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        username: str = payload.get("sub")
+        if not username:
+            raise fastapi.HTTPException(status_code=401, detail="Invalid token")
+        # Validate if the user exists and has admin privileges
+        admin = db.query(models.Admin).filter_by(username=username).first()
+        if not admin:
+            raise fastapi.HTTPException(status_code=401, detail="Admin not found")
+        # Add additional checks if needed, e.g., check if the user has admin role
+        return admin
+    except jwt.exceptions.PyJWTError:
+        raise fastapi.HTTPException(status_code=401, detail="Invalid token")
+
+
+def create_access_token(data: dict, expires_delta: timedelta) -> str:
+    to_encode = data.copy()
+    expire = datetime.utcnow() + expires_delta
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    return encoded_jwt
 
 
 async def get_current_admin(
@@ -75,7 +104,7 @@ async def get_current_admin(
         token: str = fastapi.Depends(oauth2schema),
 ):
     try:
-        payload = _jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
         admin = db.query(models.Admin).get(payload["id"])
     except:
         raise fastapi.HTTPException(status_code=401, detail="Invalid email or password")
@@ -98,8 +127,8 @@ async def get_users(db: Session, skip: int = 0, limit: int = 100) -> List[models
     return list(map(schemas.User.from_orm, users))
 
 
-async def get_user_by_user_id(user_id: int, db: "Session"):
-    user = db.query(models.User).filter(models.User.user_id == user_id).first()
+async def get_user_by_telegram_id(telegram_id: int, db: "Session"):
+    user = db.query(models.User).filter(models.User.telegram_id == telegram_id).first()
     return user
 
 

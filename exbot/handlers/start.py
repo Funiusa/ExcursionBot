@@ -2,7 +2,6 @@ from aiogram import types, filters
 import text
 from dispatcher import dp
 from keyboards.inline.ikb import main_menu
-from keyboards.keyboard.keyboards import main_keyboard
 
 
 @dp.message_handler(commands=["start"])

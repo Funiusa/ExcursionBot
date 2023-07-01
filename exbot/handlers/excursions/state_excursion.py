@@ -1,10 +1,8 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-# from content.questions import questions
 from dispatcher import dp, bot
 from keyboards.keyboard import keyboards
-from keyboards.inline import ikb
 from state import QuestionsState
 from utils.data import get_addition_data, clear_answer
 from database.services import get_excursion_by_title
@@ -92,7 +90,6 @@ async def ask_next_question(message: types.Message, state: FSMContext, index: in
 async def get_question(message: types.Message, state: FSMContext):
     data = await state.get_data()
     path = data["text"]
-    # await message.answer_photo(photo=path)
     with open(path, "rb") as image:
         await message.answer_photo(photo=image, reply_markup=keyboards.complete)
     await state.update_data(hint=None)

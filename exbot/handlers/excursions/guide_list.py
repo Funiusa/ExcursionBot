@@ -1,5 +1,4 @@
 from aiogram import types, filters
-from sqlalchemy import select
 
 from database.base import session
 from database import services
@@ -75,9 +74,9 @@ excursion_ikb = types.InlineKeyboardMarkup()
 
 @dp.callback_query_handler(lambda c: c.data.startswith("guide_detail_"))
 async def excursion_detail(call: types.CallbackQuery):
-    user_id = call.from_user.id
+    telegram_id = call.from_user.id
     title = call.data.split("_")[-1]
-    user = await services.get_user_by_user_id(user_id=user_id, db=session)
+    user = await services.get_user_by_telegram_id(telegram_id=telegram_id, db=session)
 
     excursion = await get_excursion_by_title(title=title, db=session)
 
@@ -88,7 +87,7 @@ async def excursion_detail(call: types.CallbackQuery):
         )
     else:
         choose_button = types.InlineKeyboardButton(
-            "Купить 💳", callback_data=f"buy_excursion_{title}_{user_id}"
+            "Купить 💳", callback_data=f"buy_excursion_{title}_{telegram_id}"
         )
     excursion_ikb.inline_keyboard.clear()
     excursion_ikb.add(back_button, choose_button)

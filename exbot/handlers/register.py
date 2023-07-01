@@ -1,12 +1,10 @@
-from asyncio import sleep
-
 from aiogram import types, filters
 from aiogram.dispatcher import FSMContext
 from sqlalchemy import select
 
 from database import services, schemas
 from database.base import session
-from dispatcher import dp, bot
+from dispatcher import dp
 from state.register import Registration
 from database.models import User
 from utils.tools import phone_validation
@@ -64,7 +62,7 @@ async def check_contact(message: types.message, state: FSMContext):
     user_id = data["user_id"]
     username = data["username"]
     phone = data["phone"]
-    user = await services.get_user_by_user_id(user_id=user_id, db=session)
+    user = await services.get_user_by_telegram_id(telegram_id=user_id, db=session)
     if not user and phone_validation(phone):
         data = {"user_id": user_id, "username": username, "phone": phone}
         user_create = schemas.UserCreate(**data)

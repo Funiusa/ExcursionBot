@@ -7,11 +7,12 @@ import passlib.hash as _hash
 
 
 class Admin(Base):
-    __tablename__ = "admin"
+    __tablename__ = "admins"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True, nullable=True,
-                                             index=True)
+    telegram_id: Mapped[int] = mapped_column(
+        BigInteger, unique=True, nullable=True, index=True
+    )
     username: Mapped[str] = mapped_column(unique=True, nullable=False, index=True)
     email: Mapped[str] = mapped_column(unique=True, nullable=True, index=True)
     hash_password: Mapped[str]
