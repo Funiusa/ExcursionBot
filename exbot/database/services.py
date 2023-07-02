@@ -3,8 +3,9 @@ from typing import List
 
 import fastapi
 import jwt
+import sqlalchemy
 from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from database.base import Base, engine, SessionLocal
@@ -41,12 +42,7 @@ async def get_admin_by_email(email: str, db: "Session"):
 
 
 async def create_admin(admin: schemas.AdminCreate, db: "Session") -> schemas.Admin:
-    # admin = models.Admin(
-    #     telegram_id=admin.telegram_id,
-    #     username=admin.username,
-    #     email=admin.email,
-    #     hash_password=hash.bcrypt.hash(admin.hash_password),
-    # )
+
     admin = models.Admin(**admin.dict())
     db.add(admin)
     try:
@@ -120,6 +116,9 @@ async def create_user(user: schemas.UserCreate, db: "Session") -> schemas.User:
     except IntegrityError as ex:
         db.rollback()
         raise fastapi.HTTPException(status_code=404, detail=f"Exception: {ex}")
+    except SQLAlchemyError as ex:
+        db.rollback()
+        raise fastapi.HTTPException(status_code=500, detail=f"Exception: {ex}")
 
 
 async def get_users(db: Session, skip: int = 0, limit: int = 100) -> List[models.User]:
@@ -128,8 +127,12 @@ async def get_users(db: Session, skip: int = 0, limit: int = 100) -> List[models
 
 
 async def get_user_by_telegram_id(telegram_id: int, db: "Session"):
-    user = db.query(models.User).filter(models.User.telegram_id == telegram_id).first()
-    return user
+    try:
+        user = db.query(models.User).filter_by(telegram_id=telegram_id).first()
+        return user
+    except IntegrityError:
+        db.rollback()
+        raise fastapi.HTTPException(status_code=404, detail="User doesn't exists")
 
 
 async def retrieve_user(user_id: int, db: "Session") -> schemas.User:

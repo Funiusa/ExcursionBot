@@ -9,7 +9,7 @@ class AdminBase(BaseModel):
 
 
 class AdminCreate(AdminBase):
-    hash_password: str = Field(default=None)
+    password: str = Field(default=None)
 
     class Config:
         orm_mode = True
@@ -17,6 +17,7 @@ class AdminCreate(AdminBase):
 
 class Admin(AdminBase):
     id: int
+    password: str
 
     class Config:
         orm_mode = True

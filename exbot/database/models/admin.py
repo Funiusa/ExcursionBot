@@ -15,7 +15,7 @@ class Admin(Base):
     )
     username: Mapped[str] = mapped_column(unique=True, nullable=False, index=True)
     email: Mapped[str] = mapped_column(unique=True, nullable=True, index=True)
-    hash_password: Mapped[str]
+    password: Mapped[str]
 
     def verify_password(self, password: str):
-        return _hash.bcrypt.verify(password, self.hash_password)
+        return _hash.bcrypt.verify(password, self.password)

@@ -35,8 +35,7 @@ async def registration_state_handler(call: types.CallbackQuery):
     markup.add(kb)
     telegram_id = call.from_user.id
 
-    result = session.execute(select(User).where(User.telegram_id == telegram_id))
-    user = result.one_or_none()
+    user = await services.get_user_by_telegram_id(telegram_id=telegram_id, db=session)
     if not user:
         await call.message.delete()
         await Registration.contact.set()
@@ -62,8 +61,7 @@ async def check_contact(message: types.message, state: FSMContext):
     telegram_id = data["telegram_id"]
     username = data["username"]
     phone = data["phone"]
-    user = await services.get_user_by_telegram_id(telegram_id=telegram_id, db=session)
-    if not user and phone_validation(phone):
+    if phone_validation(phone):
         data = {"telegram_id": telegram_id, "username": username, "phone": phone}
         user_create = schemas.UserCreate(**data)
         await services.create_user(user_create, session)
