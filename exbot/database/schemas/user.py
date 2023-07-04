@@ -1,7 +1,7 @@
 from typing import List
 
 from pydantic import BaseModel, Field
-from .excursion import ExcursionCreate, Excursion
+from .excursion import UserExcursions
 
 
 class UserBase(BaseModel):
@@ -12,12 +12,11 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     pass
-    # excursions: List[ExcursionCreate] = Field(default=[])
 
 
 class User(UserBase):
     id: int
-    excursions: List[Excursion] = Field(default=[])
+    excursions: List[UserExcursions] = Field(default=[])
 
     class Config:
         orm_mode = True

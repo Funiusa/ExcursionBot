@@ -1,74 +1,84 @@
-from typing import List, Annotated, Dict
+from typing import Annotated
 
 import fastapi
-from fastapi import Depends, security, APIRouter
-from sqlalchemy.orm import Session
+from fastapi import Depends, APIRouter
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from database import models, schemas, services
+from api.auth import jwt_handler
+from database import schemas, services, crud
+from api.auth.jwt_handler import get_current_admin
 
 router = APIRouter(
     prefix="/api/excursions",
     tags=["Excursions"],
-    # dependencies=[Depends(get_token_header)],
+    # dependencies=[Depends(get_current_admin)],
     responses={404: {"description": "Not found"}},
 )
 
 
-@router.post("/excursions", response_model=schemas.Excursion)
+@router.post("/")
 async def create_excursion(
-    excursion: schemas.ExcursionCreate, db: Session = Depends(services.get_db)
+    excursion: schemas.ExcursionCreate, db: AsyncSession = Depends(services.get_session)
 ):
-    return await services.create_excursion(excursion=excursion, db=db)
+    await crud.excursions.create_excursion(excursion=excursion, db=db)
+    return {
+        "excursion": excursion,
+        "message": f"Excursion {excursion.title} was successfully created",
+    }
 
 
-@router.get("/excursions")
+@router.get("/")
 async def get_excursions(
-    token: Annotated[str, Depends(services.oauth2schema)],
-    db: Session = Depends(services.get_db),
+    # token: Annotated[str, Depends(jwt_handler.oauth2schema)],
+    db: AsyncSession = Depends(services.get_session),
 ):
-    excursions = await services.get_excursions(db=db)
-    return {"excursions": excursions, "token": token}
+    excursions = await crud.excursions.get_excursions(db=db)
+    return {"excursions": excursions}
 
 
-@router.get("/excursions/{pk}", response_model=schemas.Excursion)
-async def retrieve_excursion(pk: int, db: Session = Depends(services.get_db)):
-    excursion = await services.retrieve_excursion(pk, db)
+@router.get("/{pk}", response_model=schemas.Excursion)
+async def retrieve_excursion(pk: int, db: AsyncSession = Depends(services.get_session)):
+    excursion = await crud.excursions.retrieve_excursion(pk, db)
     if excursion is None:
         raise fastapi.HTTPException(status_code=404, detail="Excursion not found")
 
     return excursion
 
 
-@router.put("/excursions/{pk}", response_model=schemas.Excursion)
+@router.put("/{pk}", response_model=schemas.Excursion)
 async def update_excursion(
-    pk: int, data: schemas.ExcursionCreate, db: Session = Depends(services.get_db)
+    pk: int,
+    data: schemas.ExcursionCreate,
+    db: AsyncSession = Depends(services.get_session),
 ):
-    excursion = await services.retrieve_excursion(pk, db)
+    excursion = await crud.excursions.retrieve_excursion(pk, db)
     if excursion is None:
         raise fastapi.HTTPException(status_code=404, detail="Excursion not found")
-    return await services.update_excursion(excursion, data, db)
+    return await crud.excursions.update_excursion(excursion, data, db)
 
 
-@router.delete("/excursions/{pk}")
-async def delete_excursion_endpoint(pk: int, db: Session = Depends(services.get_db)):
-    excursion = await services.retrieve_excursion(pk, db)
+@router.delete("/{pk}")
+async def delete_excursion_endpoint(
+    pk: int, db: AsyncSession = Depends(services.get_session)
+):
+    excursion = await crud.excursions.retrieve_excursion(pk, db)
     if excursion is None:
         raise fastapi.HTTPException(status_code=404, detail="Excursion not found")
 
-    await services.delete_excursion(excursion, db)
+    await crud.excursions.delete_excursion(excursion, db)
     return {f"Excursion {pk} successfully deleted"}
 
 
-@router.post("/excursions/{excursion_pk}/questions/", response_model=schemas.Question)
+@router.post("/questions/{excursion_pk}", response_model=schemas.Question)
 async def create_excursion_questions(
     excursion_pk: int,
     question: schemas.QuestionCreate,
-    db: Session = Depends(services.get_db),
+    db: AsyncSession = Depends(services.get_session),
 ):
-    db_excursion = await services.retrieve_excursion(e_id=excursion_pk, db=db)
+    db_excursion = await crud.excursions.retrieve_excursion(e_id=excursion_pk, db=db)
     if db_excursion is None:
         raise fastapi.HTTPException(status_code=404, detail="Excursion not found")
-    question = await services.create_question(
+    question = await crud.questions.create_question(
         question=question, db=db, excursion_id=excursion_pk
     )
     return question

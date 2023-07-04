@@ -1,8 +1,6 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from sqlalchemy import select
-
-from database import models
-from database.base import session
+from database import crud
+from database.base import async_session
 
 inline_help = InlineKeyboardMarkup(
     row_width=2,
@@ -50,8 +48,8 @@ ikb = [
 ]
 
 
-def get_excursions_ikb() -> list[InlineKeyboardButton]:
-    guides = session.execute(select(models.Excursion)).scalars().all()
+async def get_excursions_ikb() -> list[InlineKeyboardButton]:
+    guides = await crud.excursions.get_excursions(db=async_session)
     guide_ikb = [
         InlineKeyboardButton(g.title, callback_data=f"guide_detail_{g.title}")
         for g in guides

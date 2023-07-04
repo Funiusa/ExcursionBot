@@ -1,8 +1,7 @@
 from aiogram import types, filters
 
-from database.base import session
-from database import services
-from database.services import get_excursion_by_title
+from database.base import async_session
+from database import crud
 from dispatcher import dp, bot
 from content import greet
 from keyboards.inline import ikb
@@ -12,7 +11,7 @@ from keyboards.inline import ikb
 @dp.message_handler(commands=["anti_excursions"])
 async def excursions_list(message: types.Message):
     ex_markup = types.InlineKeyboardMarkup(row_width=1)
-    excursions_buttons = ikb.get_excursions_ikb()
+    excursions_buttons = await ikb.get_excursions_ikb()
     ex_markup.add(*excursions_buttons)
     if excursions_buttons:
         await message.answer(
@@ -28,7 +27,7 @@ async def excursions_list(message: types.Message):
 @dp.callback_query_handler(filters.Text("guides_list"))
 async def show_excursions(call: types.CallbackQuery):
     ex_markup = types.InlineKeyboardMarkup(row_width=1)
-    excursions_buttons = ikb.get_excursions_ikb()
+    excursions_buttons = await ikb.get_excursions_ikb()
     ex_markup.add(*excursions_buttons)
     await call.message.edit_text(
         text=greet.excursion_greet.format(
@@ -42,7 +41,7 @@ async def show_excursions(call: types.CallbackQuery):
 async def show_excursions_main(call: types.CallbackQuery):
     await call.answer()
     ex_markup = types.InlineKeyboardMarkup(row_width=1)
-    excursions_buttons = ikb.get_excursions_ikb()
+    excursions_buttons = await ikb.get_excursions_ikb()
     ex_markup.add(*excursions_buttons, ikb.back_to_main_menu)
     await call.message.edit_text(
         text=greet.excursion_greet.format(
@@ -76,9 +75,13 @@ excursion_ikb = types.InlineKeyboardMarkup()
 async def excursion_detail(call: types.CallbackQuery):
     telegram_id = call.from_user.id
     title = call.data.split("_")[-1]
-    user = await services.get_user_by_telegram_id(telegram_id=telegram_id, db=session)
+    user = await crud.users.get_user_by_telegram_id(
+        telegram_id=telegram_id, db=async_session
+    )
 
-    excursion = await get_excursion_by_title(title=title, db=session)
+    excursion = await crud.excursions.get_excursion_by_title(
+        title=title, db=async_session
+    )
 
     back_button = types.InlineKeyboardButton("Назад", callback_data="guides_list")
     if user and title in [ex.title for ex in user.excursions]:

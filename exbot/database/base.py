@@ -1,13 +1,20 @@
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.asyncio import (
+    create_async_engine,
+    async_sessionmaker,
+    AsyncSession,
+    AsyncAttrs,
+)
 
-from sqlalchemy import create_engine, MetaData
-from sqlalchemy.orm import sessionmaker, DeclarativeBase
-from config import url, async_url
-
-engine = create_engine(url=url, echo=True, future=True)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-session = SessionLocal()
+from sqlalchemy.orm import DeclarativeBase
+from config import url
 
 
-Base = declarative_base()
-meta = MetaData()
+async_engine = create_async_engine(url, echo=True)
+SessionAsync = async_sessionmaker(
+    autoflush=False, bind=async_engine, class_=AsyncSession, expire_on_commit=False
+)
+async_session = SessionAsync()
+
+
+class Base(AsyncAttrs, DeclarativeBase):
+    pass

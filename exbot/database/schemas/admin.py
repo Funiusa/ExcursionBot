@@ -17,7 +17,6 @@ class AdminCreate(AdminBase):
 
 class Admin(AdminBase):
     id: int
-    password: str
 
     class Config:
         orm_mode = True
@@ -29,6 +28,10 @@ class Admin(AdminBase):
                 "password": "pass",
             }
         }
+
+
+class AdminRegister(AdminBase):
+    password: str
 
 
 class AdminLogin(BaseModel):

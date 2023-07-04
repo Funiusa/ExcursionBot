@@ -1,10 +1,10 @@
-from database.base import session
+from database.base import async_session
 from dispatcher import dp, bot
 from aiogram import types, filters
 
 # from config import PAY_TOKEN
 from keyboards.inline import ikb
-from database import services
+from database import crud
 
 
 @dp.callback_query_handler(lambda c: c.data.startswith("buy_excursion_"))
@@ -13,8 +13,8 @@ async def payment(call: types.CallbackQuery):
     data = call.data.split("_")
     telegram_id = data[-1]
     excursion_title = data[-2]
-    user = await services.get_user_by_telegram_id(
-        telegram_id=int(telegram_id), db=session
+    user = await crud.users.get_user_by_telegram_id(
+        telegram_id=int(telegram_id), db=async_session
     )
     if not user:
         await call.answer("You have to register before")
@@ -25,11 +25,13 @@ async def payment(call: types.CallbackQuery):
             reply_markup=ikb.register_ikb,
         )
     else:
-        excursion = await services.get_excursion_by_title(excursion_title, session)
+        excursion = await crud.excursions.get_excursion_by_title(
+            excursion_title, async_session
+        )
         user.excursions.extend([excursion])
-        session.commit()
+        await async_session.commit()
         ex_markup = types.InlineKeyboardMarkup(row_width=1)
-        excursions_buttons = ikb.get_excursions_ikb()
+        excursions_buttons = await ikb.get_excursions_ikb()
         ex_markup.add(*excursions_buttons)
         await call.message.edit_text(
             text=f"Congratulate! You buy {excursion_title}",

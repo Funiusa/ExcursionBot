@@ -13,17 +13,9 @@ DATABASE_HOST = os.getenv("DATABASE_HOST")
 DATABASE_PORT = os.getenv("DATABASE_PORT")
 
 admins_id = os.getenv("ADMINS")
-async_url = URL.create(
-    "postgresql+asyncpg",
-    username=DATABASE_USER,
-    password=DATABASE_PASSWORD,
-    host=DATABASE_HOST,
-    port=int(DATABASE_PORT),
-    database=DATABASE_NAME,
-)
 
 url = URL.create(
-    "postgresql+psycopg2",
+    "postgresql+asyncpg",
     username=DATABASE_USER,
     password=DATABASE_PASSWORD,
     host=DATABASE_HOST,

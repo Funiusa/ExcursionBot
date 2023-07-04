@@ -22,3 +22,10 @@ class Excursion(ExcursionBase):
 
     class Config:
         orm_mode = True
+
+
+class UserExcursions(ExcursionBase):
+    id: int
+
+    class Config:
+        orm_mode = True
