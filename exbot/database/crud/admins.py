@@ -94,6 +94,19 @@ async def retrieve_admin(admin_id: int, db: "AsyncSession") -> schemas.Admin:
         )
 
 
+async def update_admin(
+    admin: models.Admin, data: schemas.AdminCreate, db: "AsyncSession"
+):
+    admin.username = data.username
+    admin.email = data.email
+    admin.telegram_id = data.telegram_id
+    admin.is_superuser = False
+
+    await db.commit()
+    await db.refresh(admin)
+    return schemas.Admin.from_orm(admin)
+
+
 async def delete_admin(admin: models.Admin, db: "AsyncSession"):
     await db.delete(admin)
     await db.commit()

@@ -46,9 +46,21 @@ async def register_create_admin(
 @router.get("/{admin_id}")
 async def retrieve_admin(
     admin_id: int, session: AsyncSession = Depends(base.get_session)
-):
+) -> schemas.Admin:
     admin = await admins.retrieve_admin(admin_id, session)
     return admin
+
+
+@router.put("/{admin_id}")
+async def update_admin(
+    admin_id: int,
+    data: schemas.AdminCreate,
+    session: AsyncSession = Depends(base.get_session),
+):
+    admin = await admins.retrieve_admin(admin_id=admin_id, db=session)
+    updated_admin = await admins.update_admin(admin=admin, data=data, db=session)
+
+    return {"success": f"Admin {admin_id} was updated", "result": updated_admin}
 
 
 @router.delete("/{admin_id}", dependencies=[Depends(admins.get_current_superuser)])
