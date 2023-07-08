@@ -1,6 +1,6 @@
-from .admin import Admin
-from .user import User
-from .question import Question
 from .excursion import Excursion
+from .question import Question
+from .user import User
+from .admin import Admin
 
 __all__ = ["Admin", "User", "Question", "Excursion"]

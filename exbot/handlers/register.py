@@ -1,13 +1,13 @@
-from aiogram import types, filters
+from aiogram import filters, types
 from aiogram.dispatcher import FSMContext
 
-from database import schemas, crud
-from database.base import async_session
+from database import crud, schemas
+from database.base import db
 from dispatcher import dp
+from keyboards.inline import ikb
+from keyboards.keyboard.keyboards import main_keyboard
 from state.register import Registration
 from utils.tools import phone_validation
-from keyboards.keyboard.keyboards import main_keyboard
-from keyboards.inline import ikb
 
 
 @dp.message_handler(commands=["registration"])
@@ -33,9 +33,7 @@ async def registration_state_handler(call: types.CallbackQuery):
     markup.add(kb)
     telegram_id = call.from_user.id
 
-    user = await crud.users.get_user_by_telegram_id(
-        telegram_id=telegram_id, db=async_session
-    )
+    user = await crud.users.get_user_by_telegram_id(telegram_id=telegram_id, db=db)
     if not user:
         await call.message.delete()
         await Registration.contact.set()
@@ -64,7 +62,7 @@ async def check_contact(message: types.message, state: FSMContext):
     if phone_validation(phone):
         data = {"telegram_id": telegram_id, "username": username, "phone": phone}
         user_data = schemas.UserCreate(**data)
-        await crud.users.create_user(user_data, async_session)
+        await crud.users.create_user(user=user_data, db=db)
         await message.delete()
         await state.finish()
         text = "Your contact was successfully registered"

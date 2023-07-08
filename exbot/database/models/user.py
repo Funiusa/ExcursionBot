@@ -1,17 +1,12 @@
-from typing import Optional, List
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from database.base import Base
-from .excursion import Excursion
+from typing import List, Optional
 
-from sqlalchemy import (
-    Column,
-    Integer,
-    BigInteger,
-    String,
-    Table,
-    ForeignKey,
-    Boolean,
-)
+from sqlalchemy import Column, ForeignKey, Integer, String, Table
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.types import BigInteger
+
+from database.base import Base
+
+from .excursion import Excursion
 
 user_excursions = Table(
     "user_excursions",
@@ -31,7 +26,9 @@ class User(Base):
     username: Mapped[Optional[str]]
     phone: Mapped[str] = Column(String, unique=True, nullable=False)
     excursions: Mapped[List["Excursion"]] = relationship(
-        "Excursion", secondary=user_excursions
+        "Excursion",
+        secondary=user_excursions,
+        cascade="all, delete",
     )
 
     def __str__(self):

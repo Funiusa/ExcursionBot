@@ -1,9 +1,7 @@
-from sqlalchemy import BigInteger
-from sqlalchemy.orm import Mapped, mapped_column
-
 from database.base import Base
-
-import passlib.hash as _hash
+from typing import Optional
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import BigInteger
 
 
 class Admin(Base):
@@ -11,11 +9,11 @@ class Admin(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     telegram_id: Mapped[int] = mapped_column(
-        BigInteger, unique=True, nullable=True, index=True
+        BigInteger, unique=True, nullable=False, index=True
     )
-    username: Mapped[str] = mapped_column(unique=True, nullable=False, index=True)
-    email: Mapped[str] = mapped_column(unique=True, nullable=True, index=True)
-    password: Mapped[str]
-
-    def verify_password(self, password: str):
-        return _hash.bcrypt.verify(password, self.password)
+    username: Mapped[Optional[str]]
+    email: Mapped[str] = mapped_column(unique=True, index=True)
+    password: Mapped[str] = mapped_column(nullable=False)
+    is_superuser: Mapped[bool] = mapped_column(
+        nullable=False, default=False, index=True
+    )

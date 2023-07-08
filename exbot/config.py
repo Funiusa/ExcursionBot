@@ -1,6 +1,7 @@
 import os
-from sqlalchemy import URL
+
 from dotenv import load_dotenv
+from sqlalchemy import URL
 
 load_dotenv()
 
@@ -12,7 +13,10 @@ DATABASE_PASSWORD = os.getenv("POSTGRES_USER")
 DATABASE_HOST = os.getenv("DATABASE_HOST")
 DATABASE_PORT = os.getenv("DATABASE_PORT")
 
-admins_id = os.getenv("ADMINS")
+SU_USER_TELEGRAM = int(os.environ["SU_USER_TELEGRAM"])
+SU_USERNAME = os.environ["SU_USERNAME"]
+SU_USER_EMAIL = os.environ["SU_USER_EMAIL"]
+SU_USER_PASS = os.environ["SU_USER_PASS"]
 
 url = URL.create(
     "postgresql+asyncpg",
@@ -22,3 +26,5 @@ url = URL.create(
     port=int(DATABASE_PORT),
     database=DATABASE_NAME,
 )
+
+alembic_url = f"postgresql+psycopg2://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"

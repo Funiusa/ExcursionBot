@@ -4,14 +4,15 @@ from aiogram import executor
 from aiogram.dispatcher import Dispatcher
 
 import config
-from database.services import create_async_database
+from database import base
+from handlers import dp
 from utils.notify_admins import on_startup_notify
 from utils.set_default_commands import set_default_commands
-from handlers import dp
 
 
 async def on_startup(dispatcher: Dispatcher):
-    await create_async_database()
+    await base.create_all()
+    await base.create_superuser()
     await on_startup_notify(dispatcher)
     await set_default_commands(dispatcher)
 

@@ -1,39 +1,46 @@
-from typing import Union
-from pydantic import BaseModel, Field
+import pydantic
+from pydantic import BaseModel
 
 
 class AdminBase(BaseModel):
-    telegram_id: Union[int, None] = None
-    username: str = Field(default=None)
-    email: str = Field(default=None)
+    telegram_id: int = pydantic.Field(default=None)
+    username: str = pydantic.Field(default=None)
+    email: str = pydantic.Field(default=None)
 
 
 class AdminCreate(AdminBase):
-    password: str = Field(default=None)
+    password: str = pydantic.Field(default=None)
 
     class Config:
-        orm_mode = True
-
-
-class Admin(AdminBase):
-    id: int
-
-    class Config:
-        orm_mode = True
-        schema_extra = {
-            "example": {
-                "telegram_id": 411345345,
-                "username": "Example",
-                "email": "example@example.com",
-                "password": "pass",
+        the_schema = {
+            "admin_demo": {
+                "telegram_id": 2345345,
+                "username": "admin",
+                "email": "admin@admin.com",
+                "password": "adminpassword134",
             }
         }
 
 
-class AdminRegister(AdminBase):
-    password: str
+class Admin(AdminBase):
+    id: int
+    telegram_id: int = pydantic.Field(default=None)
+    username: str = pydantic.Field(default=None)
+    email: str = pydantic.Field(default=None)
+    is_superuser: bool = pydantic.Field(default=False)
+
+    class Config:
+        orm_mode = True
 
 
 class AdminLogin(BaseModel):
-    username: str
-    password: str
+    email: str = pydantic.Field(default=None)
+    password: str = pydantic.Field(default=None)
+
+    class Config:
+        the_schema = {
+            "admin_demo_login": {
+                "email": "admin@admin.com",
+                "password": "adminpassword134",
+            }
+        }

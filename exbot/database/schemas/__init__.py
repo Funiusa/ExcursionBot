@@ -1,7 +1,7 @@
-from .excursion import ExcursionCreate, Excursion
+from .excursion import Excursion, ExcursionCreate
 from .question import Question, QuestionCreate
 from .user import User, UserCreate, UserListResponse
-from .admin import Admin, AdminCreate, AdminLogin, AdminRegister
+from .admin import Admin, AdminCreate, AdminLogin
 
 __all__ = [
     "Excursion",
@@ -14,5 +14,4 @@ __all__ = [
     "Admin",
     "AdminCreate",
     "AdminLogin",
-    "AdminRegister",
 ]

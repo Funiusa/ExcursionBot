@@ -1,12 +1,11 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from dispatcher import dp, bot
+from database import crud, base
+from dispatcher import bot, dp
 from keyboards.keyboard import keyboards
 from state import QuestionsState
-from utils.data import get_addition_data, clear_answer
-from database.base import async_session
-from database import crud
+from utils.data import clear_answer, get_addition_data
 
 excursion_ikb = types.InlineKeyboardMarkup()
 
@@ -18,9 +17,7 @@ async def guide_introduction_handler(call: types.CallbackQuery):
     guide_title = data[1]
     # guide = next((g for g in guides if g["title"] == guide_title), None)
 
-    guide = await crud.excursions.get_excursion_by_title(
-        title=guide_title, db=async_session
-    )
+    guide = await crud.excursions.get_excursion_by_title(title=guide_title, db=base.db)
     message_id = call.message.message_id
     back_button = types.InlineKeyboardButton(
         "Назад", callback_data=f"guides_end_{guide_title}_{message_id}"
@@ -48,9 +45,7 @@ async def guide_introduction_handler(call: types.CallbackQuery):
 async def start_handler(callback_query: types.CallbackQuery, state: FSMContext):
     data = callback_query.data.split("_")
     guide_title = data[-1]
-    guide = await crud.excursions.get_excursion_by_title(
-        title=guide_title, db=async_session
-    )
+    guide = await crud.excursions.get_excursion_by_title(title=guide_title, db=base.db)
     questions = [q for q in guide.questions]
     await state.update_data(questions=questions)
     await ask_next_question(message=callback_query.message, state=state, index=0)

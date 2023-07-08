@@ -1,9 +1,8 @@
-from aiogram import types, filters
+from aiogram import filters, types
 
-from database.base import async_session
-from database import crud
-from dispatcher import dp, bot
 from content import greet
+from database import crud, base
+from dispatcher import bot, dp
 from keyboards.inline import ikb
 
 
@@ -75,13 +74,9 @@ excursion_ikb = types.InlineKeyboardMarkup()
 async def excursion_detail(call: types.CallbackQuery):
     telegram_id = call.from_user.id
     title = call.data.split("_")[-1]
-    user = await crud.users.get_user_by_telegram_id(
-        telegram_id=telegram_id, db=async_session
-    )
+    user = await crud.users.get_user_by_telegram_id(telegram_id=telegram_id, db=base.db)
 
-    excursion = await crud.excursions.get_excursion_by_title(
-        title=title, db=async_session
-    )
+    excursion = await crud.excursions.get_excursion_by_title(title=title, db=base.db)
 
     back_button = types.InlineKeyboardButton("Назад", callback_data="guides_list")
     if user and title in [ex.title for ex in user.excursions]:

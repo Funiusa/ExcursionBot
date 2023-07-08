@@ -1,6 +1,7 @@
 from typing import List
 
 from pydantic import BaseModel, Field
+
 from .excursion import UserExcursions
 
 
@@ -25,6 +26,7 @@ class User(UserBase):
                 "telegram_id": 411345345,
                 "username": "Example",
                 "email": "example@example.com",
+                "excursions": [],
             }
         }
 

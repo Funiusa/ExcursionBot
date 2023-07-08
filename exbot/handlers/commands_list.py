@@ -1,6 +1,7 @@
-from aiogram import types, filters
-from dispatcher import dp
+from aiogram import filters, types
+
 from content.main_text import commands_list
+from dispatcher import dp
 from keyboards.inline.ikb import main_menu
 
 

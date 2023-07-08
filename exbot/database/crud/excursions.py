@@ -1,13 +1,12 @@
 from typing import List
 
+import fastapi
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from database import schemas, models
-
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from sqlalchemy import select
-import fastapi
+from database import models, schemas
 
 
 async def create_excursion(

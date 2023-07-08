@@ -1,7 +1,4 @@
-from aiogram.types import (
-    KeyboardButton,
-    ReplyKeyboardMarkup,
-)
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
 registration_button = KeyboardButton(text="Регистрация", url="http://google.com")
 channel_link_button = KeyboardButton(

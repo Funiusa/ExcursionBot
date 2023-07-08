@@ -1,12 +1,10 @@
 from typing import List
 
+from sqlalchemy import Boolean, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import (
-    String,
-    Boolean,
-    Text,
-)
+
 from database.base import Base
+
 from .question import Question
 
 
@@ -25,7 +23,7 @@ class Excursion(Base):
     questions: Mapped[List["Question"]] = relationship(
         "Question",
         back_populates="excursion",
-        cascade="all, delete-orphan",
+        cascade="all, delete",
         passive_deletes=True,
     )
 

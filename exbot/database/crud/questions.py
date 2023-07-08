@@ -23,14 +23,16 @@ async def create_question(
 
 
 async def get_questions(db: "AsyncSession") -> List[schemas.Question]:
-    result = await db.execute(select(models.Question))
+    stmt = select(models.Question)
+    result = await db.execute(statement=stmt)
     questions = result.scalars().all()
     return list(map(schemas.Question.from_orm, questions))
 
 
 async def retrieve_question(q_id: int, db: "AsyncSession"):
     try:
-        result = await db.execute(select(models.Question).filter_by(id=q_id))
+        stmt = select(models.Question).filter_by(id=q_id)
+        result = await db.execute(statement=stmt)
         question = result.scalars().first()
         return question
     except IntegrityError:

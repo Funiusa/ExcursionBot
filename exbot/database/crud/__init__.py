@@ -1,6 +1,3 @@
-from . import users
-from . import admins
-from . import excursions
-from . import questions
+from . import admins, excursions, questions, users
 
 __all__ = ["users", "admins", "excursions", "questions"]

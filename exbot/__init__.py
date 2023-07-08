@@ -1,3 +1,3 @@
-from config import POSTGRES_URI
+from . import config
 
-__all__ = ["POSTGRES_URI"]
+__all__ = ["config"]
