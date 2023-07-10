@@ -31,7 +31,7 @@ class AuthHandler(_security.HTTPBearer):
 
     def encode_token(self, data):
         payload = {
-            "exp": datetime.utcnow() + timedelta(days=0, minutes=5),
+            "exp": datetime.utcnow() + timedelta(days=0, minutes=30),
             "iat": datetime.utcnow(),
             "sub": data,
         }

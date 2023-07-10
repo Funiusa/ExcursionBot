@@ -1,6 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, staticfiles
 
 from api.routers import users, excursions, questions, auth, admin
+from database.base import create_all, create_superuser
 
 
 def init_app():
@@ -20,6 +21,7 @@ def init_app():
 
 
 app = init_app()
+app.mount("/static", staticfiles.StaticFiles(directory="static"), name="static")
 
 
 @app.get("/", tags=["Index"])

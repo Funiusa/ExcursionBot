@@ -4,13 +4,19 @@ import fastapi
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
-from database import models, schemas
+from database import models, schemas, crud
 
 
 async def create_question(
     question: schemas.QuestionCreate, db: "AsyncSession", excursion_id: int
 ) -> schemas.Question:
+    db_excursion = await crud.excursions.retrieve_excursion(e_id=excursion_id, db=db)
+    if db_excursion is None:
+        raise fastapi.HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Excursion not found"
+        )
     question = models.Question(**question.dict(), excursion_id=excursion_id)
     db.add(question)
     try:
@@ -19,7 +25,9 @@ async def create_question(
         return question
     except IntegrityError as ex:
         await db.rollback()
-        raise fastapi.HTTPException(status_code=404, detail=f"Error: {ex}")
+        raise fastapi.HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Integrity error"
+        )
 
 
 async def get_questions(db: "AsyncSession") -> List[schemas.Question]:
@@ -37,7 +45,9 @@ async def retrieve_question(q_id: int, db: "AsyncSession"):
         return question
     except IntegrityError:
         await db.rollback()
-        raise fastapi.HTTPException(status_code=404, detail="Question doesn't exists")
+        raise fastapi.HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Question doesn't exists"
+        )
 
 
 async def update_question(

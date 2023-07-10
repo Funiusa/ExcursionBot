@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, FilePath
 
 from .question import Question
 
@@ -9,16 +9,16 @@ class ExcursionBase(BaseModel):
     title: str
     intro: str
     description: str
-    image: str
     is_published: bool = Field(default=False)
 
 
 class ExcursionCreate(ExcursionBase):
-    pass
+    image: Optional[str]
 
 
 class Excursion(ExcursionBase):
     id: int
+    image: Optional[str]
     questions: List[Question] = Field(default=[])
 
     class Config:

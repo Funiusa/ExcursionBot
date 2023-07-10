@@ -5,7 +5,7 @@ from database import crud, base
 from dispatcher import bot, dp
 from keyboards.keyboard import keyboards
 from state import QuestionsState
-from utils.data import clear_answer, get_addition_data
+from utils.tools import clear_answer, get_addition_data
 
 excursion_ikb = types.InlineKeyboardMarkup()
 
@@ -69,7 +69,7 @@ async def ask_next_question(message: types.Message, state: FSMContext, index: in
                 answer=question.answer,
                 correct=question.correct,
                 text=question.text,
-                addition=get_addition_data(question.addition, index + 1),
+                addition=get_addition_data(path=question.addition),
                 final=question.final,
             )
             await QuestionsState.question.set()
@@ -92,7 +92,7 @@ async def get_question(message: types.Message, state: FSMContext):
     with open(path, "rb") as image:
         await message.answer_photo(photo=image, reply_markup=keyboards.complete)
     await state.update_data(hint=None)
-    await message.answer("Вводи ответ тут и жми отправить! 👇🏽")
+    await message.answer("Вводи ответ и жми отправить! 👇🏽")
 
 
 @dp.message_handler(state=QuestionsState.question)

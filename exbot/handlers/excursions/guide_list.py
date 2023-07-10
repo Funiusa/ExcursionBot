@@ -20,7 +20,7 @@ async def excursions_list(message: types.Message):
             reply_markup=ex_markup,
         )
     else:
-        await message.answer("There isn't any excursions yet")
+        await message.answer("Ни одной экскурсии еще не опубликовано =`(")
 
 
 @dp.callback_query_handler(filters.Text("guides_list"))

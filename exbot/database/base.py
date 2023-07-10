@@ -1,5 +1,3 @@
-import fastapi
-from fastapi_users.db import SQLAlchemyBaseUserTableUUID, SQLAlchemyUserDatabase
 from sqlalchemy.orm import DeclarativeBase
 
 import config
@@ -38,10 +36,6 @@ async def create_all():
 async def get_session() -> AsyncSession:
     async with AsyncSessionLocal() as session:
         yield session
-
-
-async def get_admin_db(session: AsyncSession = fastapi.Depends(get_session)):
-    yield SQLAlchemyUserDatabase(session=session, user_table=database.models.Admin)
 
 
 async def create_superuser():

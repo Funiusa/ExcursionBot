@@ -13,7 +13,7 @@ class Question(Base):
     hint: Mapped[str] = mapped_column(nullable=True)
     text: Mapped[str] = mapped_column(nullable=False)
     correct: Mapped[str] = mapped_column(nullable=False)
-    addition: Mapped[str] = mapped_column(nullable=False)
+    addition: Mapped[str] = mapped_column(nullable=True)
     final: Mapped[str] = mapped_column(nullable=False)
 
     excursion_id: Mapped[int] = mapped_column(

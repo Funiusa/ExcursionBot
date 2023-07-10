@@ -28,3 +28,7 @@ url = URL.create(
 )
 
 alembic_url = f"postgresql+psycopg2://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC = os.path.join(BASE_DIR, "static")
+STATIC_IMG = os.path.join(STATIC, "images")

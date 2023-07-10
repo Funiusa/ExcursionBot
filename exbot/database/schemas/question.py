@@ -1,18 +1,20 @@
+from typing import Optional, List
+
 from pydantic import BaseModel, Field
 
 
 class QuestionBase(BaseModel):
-    place: str
+    place: Optional[str]
     answer: str
     hint: str
-    text: str
+    text: Optional[str]
     correct: str
-    addition: str
+    addition: Optional[str] = Field(default=None)
     final: str
 
 
 class QuestionCreate(QuestionBase):
-    pass
+    id: int
 
 
 class Question(QuestionBase):

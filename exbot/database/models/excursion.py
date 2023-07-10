@@ -23,8 +23,8 @@ class Excursion(Base):
     questions: Mapped[List["Question"]] = relationship(
         "Question",
         back_populates="excursion",
-        cascade="all, delete",
         passive_deletes=True,
+        cascade="all, delete",
     )
 
     def __str__(self):

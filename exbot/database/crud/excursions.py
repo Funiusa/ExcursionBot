@@ -35,6 +35,11 @@ async def get_excursions(db: "AsyncSession") -> List[schemas.Excursion]:
         raise fastapi.HTTPException(status_code=500, detail=f"Error: {ex}")
 
 
+async def get_number_of_excursions(db: "AsyncSession") -> int:
+    excursions = await get_excursions(db)
+    return len(excursions)
+
+
 async def get_excursion_by_title(title: str, db: "AsyncSession") -> models.Excursion:
     stmt = select(models.Excursion).options(selectinload(models.Excursion.questions))
     result = await db.execute(statement=stmt.filter_by(title=title))
